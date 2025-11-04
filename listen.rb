@@ -5,7 +5,6 @@ class Listen < Formula
   sha256 "3a5801c73455179d45ca9c7d10a5a189dac6cc9d3c596e17248d6d270b6b1af7"
   license "MIT"
 
-  depends_on "python@3.11"
   depends_on "portaudio"
   depends_on "ffmpeg"
 
@@ -15,8 +14,9 @@ class Listen < Formula
 
     (bin/"listen").write <<~EOS
       #!/bin/bash
+      PYTHON=$(command -v python3 || command -v python)
       if [ ! -d "#{libexec}/venv" ]; then
-        python3.11 -m venv "#{libexec}/venv"
+        $PYTHON -m venv "#{libexec}/venv"
         source "#{libexec}/venv/bin/activate"
         pip install --quiet -r "#{libexec}/requirements.txt"
       else
@@ -27,6 +27,15 @@ class Listen < Formula
   end
 
   test do
-    assert_match "usage: listen", shell_output("#{bin}/listen --help")
+    assert_match "usage: listen", shell_output("#{bin}/listen --help 2>&1", 1)
+  end
+
+  def caveats
+    <<~EOS
+      This formula requires Python 3.8+ to be installed on your system.
+
+      If you don't have Python installed, you can install it with:
+        brew install python@3.11
+    EOS
   end
 end
