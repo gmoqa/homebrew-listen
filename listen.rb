@@ -14,23 +14,35 @@ class Listen < Formula
 
     (bin/"listen").write <<~EOS
       #!/bin/bash
+      set -e
       PYTHON=$(command -v python3 || command -v python)
       VENV_DIR="#{libexec}/venv"
+      SETUP_DONE="#{libexec}/.setup_done"
 
-      if [ ! -d "$VENV_DIR" ]; then
+      if [ ! -f "$SETUP_DONE" ]; then
         echo "Setting up listen (first run)..."
-        $PYTHON -m venv "$VENV_DIR" || {
-          echo "Error: Could not create virtual environment."
-          exit 1
-        }
+
+        if [ ! -d "$VENV_DIR" ]; then
+          $PYTHON -m venv "$VENV_DIR" || {
+            echo "Error: Could not create virtual environment."
+            exit 1
+          }
+        fi
+
         source "$VENV_DIR/bin/activate"
-        pip install --quiet --upgrade pip
-        pip install --quiet -r "#{libexec}/requirements.txt" || {
+
+        echo "Installing Python dependencies..."
+        pip install --upgrade pip > /dev/null 2>&1
+        pip install -r "#{libexec}/requirements.txt" || {
           echo "Error: Could not install dependencies."
+          echo "Try running: brew reinstall listen"
           exit 1
         }
+
+        touch "$SETUP_DONE"
         echo "Setup complete!"
       fi
+
       source "$VENV_DIR/bin/activate"
       exec python "#{libexec}/listen.py" "$@"
     EOS
