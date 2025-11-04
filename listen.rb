@@ -48,14 +48,40 @@ class Listen < Formula
     EOS
   end
 
+  def post_install
+    # Setup venv and install dependencies during brew install
+    venv_dir = libexec/"venv"
+    python = which("python3") || which("python")
+
+    unless venv_dir.exist?
+      system python, "-m", "venv", venv_dir
+    end
+
+    system venv_dir/"bin/pip", "install", "--upgrade", "pip", "--quiet"
+    system venv_dir/"bin/pip", "install", "-r", libexec/"requirements.txt", "--quiet"
+
+    # Pre-download Whisper model
+    ohai "Downloading Whisper model (this may take a moment)..."
+    system venv_dir/"bin/python", "-c",
+           "import whisper; whisper.load_model('base')"
+
+    # Mark setup as done
+    (libexec/".setup_done").write ""
+
+    # Create first_run marker so user doesn't see the hint
+    first_run_marker = Pathname(Dir.home)/".local/share/listen/.first_run_done"
+    first_run_marker.parent.mkpath
+    first_run_marker.write ""
+  end
+
   test do
     system bin/"listen", "--help"
   end
 
   def caveats
     <<~EOS
-      First run will download Whisper models (~150MB for base model).
-      This happens automatically and only once.
+      Whisper model has been pre-downloaded during installation.
+      Ready to use immediately!
 
       Requirements:
       - Python 3.8+ (included in macOS)
