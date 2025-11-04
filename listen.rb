@@ -5,8 +5,7 @@ class Listen < Formula
   sha256 "3a5801c73455179d45ca9c7d10a5a189dac6cc9d3c596e17248d6d270b6b1af7"
   license "MIT"
 
-  depends_on "portaudio"
-  depends_on "ffmpeg"
+  uses_from_macos "python"
 
   def install
     libexec.install "listen.py"
@@ -27,15 +26,20 @@ class Listen < Formula
   end
 
   test do
-    assert_match "usage: listen", shell_output("#{bin}/listen --help 2>&1", 1)
+    system bin/"listen", "--help"
   end
 
   def caveats
     <<~EOS
-      This formula requires Python 3.8+ to be installed on your system.
+      This tool requires:
+      - Python 3.8+
+      - portaudio (for audio recording)
+      - ffmpeg (for audio processing)
 
-      If you don't have Python installed, you can install it with:
-        brew install python@3.11
+      Install dependencies with:
+        brew install portaudio ffmpeg
+
+      Or if you prefer system packages, install them manually.
     EOS
   end
 end
