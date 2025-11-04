@@ -10,6 +10,7 @@ class Listen < Formula
 
   def install
     libexec.install "listen.py"
+    libexec.install "config.py"
     libexec.install "requirements.txt"
 
     (bin/"listen").write <<~EOS
