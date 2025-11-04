@@ -1,8 +1,8 @@
 class Listen < Formula
   desc "Minimal audio transcription tool - 100% on-premise"
   homepage "https://github.com/gmoqa/listen"
-  url "https://github.com/gmoqa/listen/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "3a5801c73455179d45ca9c7d10a5a189dac6cc9d3c596e17248d6d270b6b1af7"
+  url "https://github.com/gmoqa/listen/archive/refs/tags/v1.0.1.tar.gz"
+  sha256 "34a952001197d0039d23407fc7721dbf145cb8a983a762a62748a5ce9ddd3c20"
   license "MIT"
 
   uses_from_macos "python"
