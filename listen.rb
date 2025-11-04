@@ -17,20 +17,20 @@ class Listen < Formula
       VENV_DIR="#{libexec}/venv"
 
       if [ ! -d "$VENV_DIR" ]; then
-        $PYTHON -m venv "$VENV_DIR" 2>/dev/null || {
+        echo "Setting up listen (first run)..."
+        $PYTHON -m venv "$VENV_DIR" || {
           echo "Error: Could not create virtual environment."
-          echo "Make sure Python 3 is installed."
           exit 1
         }
         source "$VENV_DIR/bin/activate"
-        pip install --quiet --upgrade pip 2>/dev/null
-        pip install --quiet -r "#{libexec}/requirements.txt" 2>/dev/null || {
+        pip install --quiet --upgrade pip
+        pip install --quiet -r "#{libexec}/requirements.txt" || {
           echo "Error: Could not install dependencies."
           exit 1
         }
-      else
-        source "$VENV_DIR/bin/activate"
+        echo "Setup complete!"
       fi
+      source "$VENV_DIR/bin/activate"
       exec python "#{libexec}/listen.py" "$@"
     EOS
   end
