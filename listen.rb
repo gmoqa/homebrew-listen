@@ -14,12 +14,22 @@ class Listen < Formula
     (bin/"listen").write <<~EOS
       #!/bin/bash
       PYTHON=$(command -v python3 || command -v python)
-      if [ ! -d "#{libexec}/venv" ]; then
-        $PYTHON -m venv "#{libexec}/venv"
-        source "#{libexec}/venv/bin/activate"
-        pip install --quiet -r "#{libexec}/requirements.txt"
+      VENV_DIR="#{libexec}/venv"
+
+      if [ ! -d "$VENV_DIR" ]; then
+        $PYTHON -m venv "$VENV_DIR" 2>/dev/null || {
+          echo "Error: Could not create virtual environment."
+          echo "Make sure Python 3 is installed."
+          exit 1
+        }
+        source "$VENV_DIR/bin/activate"
+        pip install --quiet --upgrade pip 2>/dev/null
+        pip install --quiet -r "#{libexec}/requirements.txt" 2>/dev/null || {
+          echo "Error: Could not install dependencies."
+          exit 1
+        }
       else
-        source "#{libexec}/venv/bin/activate"
+        source "$VENV_DIR/bin/activate"
       fi
       exec python "#{libexec}/listen.py" "$@"
     EOS
@@ -31,15 +41,14 @@ class Listen < Formula
 
   def caveats
     <<~EOS
-      This tool requires:
-      - Python 3.8+
-      - portaudio (for audio recording)
-      - ffmpeg (for audio processing)
+      First run will download Whisper models (~150MB for base model).
+      This happens automatically and only once.
 
-      Install dependencies with:
-        brew install portaudio ffmpeg
+      Requirements:
+      - Python 3.8+ (included in macOS)
+      - Microphone access
 
-      Or if you prefer system packages, install them manually.
+      No Command Line Tools needed!
     EOS
   end
 end
