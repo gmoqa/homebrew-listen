@@ -5,6 +5,7 @@ class Listen < Formula
   sha256 "ebb477792215e5d6bf1076118652078d8789d143ad7b3d4ca5a1f8661071df46"
   license "MIT"
 
+  depends_on "ffmpeg"
   uses_from_macos "python"
 
   def install
